@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter.messagebox import showinfo
 import os
 import rsa as rsa
-from Crypto.Cipher import DES3
+from Crypto.Cipher import DES
 
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
@@ -13,8 +13,8 @@ from Crypto.Cipher import PKCS1_OAEP
 import itertools
 import string
 import itertools
-os.chdir("E:\\Code_breaking_using_intelligent_differential_attacks")
 
+os.chdir(os.getcwd())
 
 #vigenere working fine
 def vigenere_encrypt(plaintext, key):
@@ -83,41 +83,43 @@ def rsa_decrypt(ciphertext, private_key):
 
 
 #double DES used for 64 bit keys
-# def des_encrypt(plaintext, key):
-#     # Pad the plaintext to a multiple of 8 bytes
-#     padding_length = 8 - (len(plaintext) % 8)
-#     plaintext = plaintext.encode()
-#     plaintext += bytes([padding_length] * padding_length)
-
-#     # Initialize the DES cipher with the key
-#     cipher = DES.new(key, DES.MODE_ECB)
-
-#     # Encrypt the plaintext using DES
-#     ciphertext = cipher.encrypt(plaintext)
-
-#     # Return the ciphertext
-#     return ciphertext
-from Crypto.Cipher import DES3
-
 def des_encrypt(plaintext, key):
     # Pad the plaintext to a multiple of 8 bytes
     padding_length = 8 - (len(plaintext) % 8)
     plaintext = plaintext.encode()
     plaintext += bytes([padding_length] * padding_length)
 
-    # Generate 3 keys from the provided key
-    key1 = key[:8]
-    key2 = key[8:16]
-    key3 = key[16:]
+    # Initialize the DES cipher with the key
+    cipher = DES.new(key, DES.MODE_ECB)
 
-    # Initialize the Triple DES cipher with the 3 keys
-    cipher = DES3.new(key1 + key2 + key3, DES3.MODE_ECB)
-
-    # Encrypt the plaintext using Triple DES
+    # Encrypt the plaintext using DES
     ciphertext = cipher.encrypt(plaintext)
 
     # Return the ciphertext
     return ciphertext
+
+
+# from Crypto.Cipher import DES3
+
+# def des_encrypt(plaintext, key):
+#     # Pad the plaintext to a multiple of 8 bytes
+#     padding_length = 8 - (len(plaintext) % 8)
+#     plaintext = plaintext.encode()
+#     plaintext += bytes([padding_length] * padding_length)
+
+#     # Generate 3 keys from the provided key
+#     key1 = key[:8]
+#     key2 = key[8:16]
+#     key3 = key[16:]
+
+#     # Initialize the Triple DES cipher with the 3 keys
+#     cipher = DES3.new(key1 + key2 + key3, DES3.MODE_ECB)
+
+#     # Encrypt the plaintext using Triple DES
+#     ciphertext = cipher.encrypt(plaintext)
+
+#     # Return the ciphertext
+#     return ciphertext
 
 
 
@@ -131,29 +133,36 @@ def encrypt_and_save():
     attack_type=None
     if algorithm == "Playfair Cipher":
         ciphertext= playfair_encrypt(plaintext,secret_key)
+            
     elif algorithm == "Vigenere Cipher":
         attack_type='Vigenere_Cipher'
         ciphertext = vigenere_encrypt(plaintext, secret_key)
+  
     elif algorithm == "DES":
         ciphertext = des_encrypt(plaintext, bytes.fromhex(secret_key))
+            
+  
     elif algorithm == "RSA":
         private_key, public_key = generate_rsa_key_pair()
         ciphertext = rsa_encrypt(plaintext, public_key)
-    
+        
     if attack_type == 'Vigenere_Cipher':
-        with open("cipher.txt", "a") as cipher_file:
+        with open("ciphertext.txt", "a") as cipher_file:
             cipher_file.write(ciphertext + "\n")
             ciphertext_entry.delete(0, tk.END)
-            ciphertext_entry.insert(0, str(ciphertext))
+            ciphertext_entry.insert(10, str(ciphertext))
+        with open("plaintext.txt", "a") as plaintext_file:
+            plaintext_file.write(plaintext + "\n")
     else:
         with open("ciphertext.txt", "a") as cipher_file:
             cipher_file.write(ciphertext.hex() + "\n")
-            ciphertext_entry.delete(0, tk.END)
-            ciphertext_entry.insert(0, str(ciphertext.hex()))
+        with open("plaintext.txt", "a") as plaintext_file:
+            plaintext_file.write(plaintext + "\n")
+        ciphertext_entry.delete(0, tk.END)
+        ciphertext_entry.insert(0, str(ciphertext.hex()))
     
         
-    with open("plaintext.txt", "a") as plaintext_file:
-        plaintext_file.write(plaintext + "\n")
+    
 
     
     showinfo("Success", "Plaintext and ciphertext have been saved.")
@@ -185,9 +194,9 @@ key_entry.grid(row=2, column=1)
 encrypt_button = ttk.Button(frame, text="Encrypt and Save", command=encrypt_and_save)
 encrypt_button.grid(row=3, column=0, columnspan=2)
 
-ciphertext_label = ttk.Label(frame, text="Ciphertext:")
+ciphertext_label = ttk.Label(frame, text="Ciphertext: ")
 ciphertext_label.grid(row=4, column=0, sticky=tk.W)
-ciphertext_entry = ttk.Entry(frame, width=40, state="readonly")
+ciphertext_entry = ttk.Entry(frame, width=40)
 ciphertext_entry.grid(row=4, column=1)
-
 app.mainloop()
+
