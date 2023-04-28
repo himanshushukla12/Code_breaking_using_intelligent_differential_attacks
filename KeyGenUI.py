@@ -34,7 +34,7 @@ background_label.place(x=0, y=0, relwidth=1, relheight=1)
 def generate_vigenere_key():
     key = ''
     for i in range(16):
-        key += secrets.choice('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+        key += secrets.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
     key_output.delete('1.0', END)
     key_output.insert(END, key)
 
